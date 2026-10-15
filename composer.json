@@ -1,0 +1,45 @@
+{
+    "name": "akhmadomr/laravel-gdrive-backup",
+    "description": "Backup database MySQL otomatis ke Google Drive (multi-akun) + restore aman berbasis System ID untuk Laravel.",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "backup",
+        "restore",
+        "google-drive",
+        "mysql"
+    ],
+    "authors": [
+        {
+            "name": "akhmadomr"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-zip": "*",
+        "ext-pdo": "*",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "ifsnop/mysqldump-php": "^2.12|^2.13",
+        "masbug/flysystem-google-drive-ext": "^2.3|^2.4|^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Akhmadomr\\GdriveBackup\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Akhmadomr\\GdriveBackup\\GdriveBackupServiceProvider"
+            ]
+        },
+        "google/apiclient-services": [
+            "Drive",
+            "Oauth2"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
