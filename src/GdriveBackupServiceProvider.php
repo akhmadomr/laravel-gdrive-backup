@@ -124,8 +124,9 @@ class GdriveBackupServiceProvider extends ServiceProvider
                 }
 
                 $accounts = BackupSetting::getJson(GoogleAccountManager::SETTING_KEY, []);
-                if (empty($accounts)) {
-                    return; // Tidak menjadwalkan jika belum ada akun Google Drive terhubung
+                $hasLocal = !empty(config('gdrive-backup.local_disk'));
+                if (empty($accounts) && !$hasLocal) {
+                    return; // Lewati jika tidak ada akun Google Drive DAN tidak ada backup disk lokal
                 }
 
                 $scheduleData = BackupSetting::getJson(BackupRunner::SCHEDULE_KEY, config('gdrive-backup.schedule.default', []));
