@@ -1,0 +1,8 @@
+/vendor/
+composer.lock
+.env
+.env.*
+developer_credentials.json
+.phpunit.result.cache
+.DS_Store
+Thumbs.db

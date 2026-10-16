@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
     
     <!-- Floating Toast Notification -->
     <Transition
