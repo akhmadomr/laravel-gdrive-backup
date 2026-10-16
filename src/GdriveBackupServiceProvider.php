@@ -135,7 +135,13 @@ class GdriveBackupServiceProvider extends ServiceProvider
                 $timezone = config('gdrive-backup.schedule.timezone', config('app.timezone', 'Asia/Jakarta'));
 
                 $schedule = $this->app->make(Schedule::class);
-                $event = $schedule->command('gdrive-backup:run')->timezone($timezone);
+                $event = $schedule->call(function () {
+                    try {
+                        app(BackupRunner::class)->run();
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('[gdrive-backup] Scheduled backup error: ' . $e->getMessage(), ['exception' => $e]);
+                    }
+                })->name('gdrive-backup:run')->timezone($timezone);
 
                 if ($frequency === 'daily') {
                     $event->dailyAt($time);
