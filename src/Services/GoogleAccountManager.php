@@ -64,12 +64,15 @@ class GoogleAccountManager
         ], $this->accounts());
     }
 
-    public function createAuthUrl(?string $userId): string
+    public function createAuthUrl(?string $userId, ?string $returnTo = null): string
     {
         $this->ensureConfigured();
 
         $state = Str::random(40);
-        Cache::put('gdrive-backup:oauth:'.$state, $userId ?? 'guest', now()->addMinutes(10));
+        Cache::put('gdrive-backup:oauth:'.$state, [
+            'user_id' => $userId ?? 'guest',
+            'return_to' => $returnTo,
+        ], now()->addMinutes(10));
 
         $client = $this->client();
         $client->setRedirectUri($this->redirectUri());
@@ -90,8 +93,13 @@ class GoogleAccountManager
     {
         $this->ensureConfigured();
 
-        if (! $code || ! $state || ! Cache::pull('gdrive-backup:oauth:'.$state)) {
+        $stateData = $state ? Cache::pull('gdrive-backup:oauth:'.$state) : null;
+        if (! $code || ! $state || ! $stateData) {
             throw new RuntimeException('Sesi otorisasi tidak valid atau kedaluwarsa. Silakan coba lagi.');
+        }
+
+        if (is_array($stateData) && !empty($stateData['return_to'])) {
+            Cache::put('gdrive-backup:oauth:return_to:'.$state, $stateData['return_to'], now()->addMinutes(2));
         }
 
         $client = $this->client();

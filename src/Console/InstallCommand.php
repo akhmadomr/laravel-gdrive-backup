@@ -410,6 +410,13 @@ class InstallCommand extends Command
             }
         }
 
+        // Tambahkan redirect route /settings/backup jika belum ada (agar callback Google OAuth / direct link tidak 404)
+        if (!preg_match('/path:\s*[\'"]\/settings\/backup[\'"]/', $content) && str_contains($content, 'routes = [')) {
+            $redirectSnippet = "  // Backup route redirect (OAuth callback & direct access)\n  {\n    path: '/settings/backup',\n    redirect: (to) => {\n      try {\n        const stored = localStorage.getItem('user')\n        const u = stored ? JSON.parse(stored) : null\n        const role = u?.role?.name || u?.role\n        const prefix = role === 'superadmin' ? '/superadmin' : '/admin'\n        return { path: `\${prefix}/settings/backup`, query: to.query }\n      } catch {\n        return { path: '/superadmin/settings/backup', query: to.query }\n      }\n    },\n  },\n";
+            $content = str_replace('routes = [', "routes = [\n{$redirectSnippet}", $content);
+            $injected = true;
+        }
+
         // Pola generic routes = [ ... ] (hanya jika bukan grup superadmin/admin)
         if (!str_contains($content, "path: '/superadmin'") && !str_contains($content, "path: '/admin'")) {
             if (!str_contains($content, 'settings/backup') && str_contains($content, 'routes = [')) {

@@ -49,7 +49,8 @@ class BackupController extends Controller
     public function connect(Request $request): JsonResponse
     {
         try {
-            $url = $this->google->createAuthUrl((string) optional($request->user())->getAuthIdentifier());
+            $returnTo = $request->query('return_to');
+            $url = $this->google->createAuthUrl((string) optional($request->user())->getAuthIdentifier(), $returnTo);
 
             return response()->json(['success' => true, 'auth_url' => $url]);
         } catch (\Throwable $e) {
@@ -59,7 +60,9 @@ class BackupController extends Controller
 
     public function callback(Request $request): RedirectResponse
     {
-        $target = rtrim((string) config('gdrive-backup.frontend_url'), '/').'/'.ltrim(config('gdrive-backup.frontend_path'), '/');
+        $stateReturnTo = \Illuminate\Support\Facades\Cache::pull('gdrive-backup:oauth:return_to:'.$request->query('state'));
+        $targetPath = $stateReturnTo ?: config('gdrive-backup.frontend_path', '/settings/backup');
+        $target = rtrim((string) config('gdrive-backup.frontend_url'), '/').'/'.ltrim($targetPath, '/');
 
         if ($request->query('error')) {
             return redirect($target.'?google_auth=error&message='.urlencode('Otorisasi dibatalkan.'));

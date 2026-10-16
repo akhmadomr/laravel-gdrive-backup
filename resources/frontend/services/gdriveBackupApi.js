@@ -87,8 +87,11 @@ export const gdriveBackupApi = {
     return currentApi.get(resolvePath('status'))
   },
 
-  getConnectUrl() {
-    return currentApi.get(resolvePath('google/connect'))
+  getConnectUrl(returnTo = null) {
+    const currentPath = returnTo || (typeof window !== 'undefined' ? window.location.pathname : null)
+    return currentApi.get(resolvePath('google/connect'), {
+      params: currentPath ? { return_to: currentPath } : {}
+    })
   },
 
   disconnectAccount(id) {
